@@ -1,7 +1,8 @@
 import asyncio
 
 from core.clock import Clock
-from core.constants import CANCEL_WINDOW, CHANNEL_MAX, CHANNEL_MIN, CHANNEL_PREFIX, COOLDOWN
+from core.constants import CANCEL_WINDOW, CHANNEL_MAX, CHANNEL_MIN, CHANNEL_PREFIX
+from core.cooldown import calculate_available_at
 from core.exceptions import (
     AllocationNotFoundError,
     CancelWindowExpiredError,
@@ -55,7 +56,7 @@ class AllocationService:
                 )
 
             freed_at = self._clock.now()
-            available_at = freed_at + COOLDOWN
+            available_at = calculate_available_at(freed_at)
             self._repo.mark_freed(row, freed_at, available_at)
             return FreeResponse(channel=row.channel, freed_at=freed_at, available_at=available_at)
 
